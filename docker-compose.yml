@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0.31
+    container_name: "music-streaming-authentication-db"
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=authentication-db
+      - MYSQL_USER=music-streaming-authentication
+      - MYSQL_PASSWORD=music-streaming-authentication-mysql
+      - MYSQL_DATABASE=music-streaming-authentication
+      - MYSQL_ROOT_HOST=%
+    networks:
+      - fullstack
+    volumes:
+      - database_mysql:/var/lib/mysql
+
+  service:
+    build: .
+    container_name: "music-streaming-authentication-service"
+    environment:
+      DB_USERNAME: "music-streaming-authentication"
+      DB_PASSWORD: "music-streaming-authentication-mysql"
+      DB_DB: "music-streaming-authentication"
+      DB_HOST: "music-streaming-authentication-db"
+      DB_PORT: "3307"
+    ports:
+      - "8002:8002"
+    depends_on:
+      - db
+    networks:
+      - fullstack
+
+volumes:
+  database_mysql:
+
+networks:
+  fullstack:
+    driver: bridge
