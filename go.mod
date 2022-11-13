@@ -12,7 +12,7 @@ require (
 
 require (
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/golang-migrate/migrate/v4 v4.15.2
+	github.com/golang-migrate/migrate/v4 v4.15.0-beta.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect

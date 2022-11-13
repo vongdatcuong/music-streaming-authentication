@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package music_streaming.authentication.user;
+
+option go_package="./protos/v1/pb";
+
+import "protos/v1/common.proto";
+import "protos/v1/permission.proto";
+
+message User {
+  uint64 user_id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  uint32 status = 5;
+  string password = 6;
+  bool new_song_noti = 7;
+  uint64 created_at = 8;
+  uint64 updated_at = 9;
+  repeated string permissions = 10;
+}
+
+service UserService {
+  rpc GetUserList (GetUserListRequest) returns (GetUserListResponse);
+  rpc GetUserDetails (GetUserDetailsRequest) returns (GetUserDetailsResponse);
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+  rpc PutUser (PutUserRequest) returns (PutUserResponse);
+  rpc UpdateUserStatus (UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
+}
+
+message GetUserListRequest {
+  music_streaming.authentication.common.PaginationInfo pagination_info = 1;
+  GetUserListRequestFilter filter = 2;
+}
+
+message GetUserListRequestFilter {
+  uint64 user_id = 1;
+  string email = 2;
+  uint32 status = 3;
+  uint64 created_time_from = 4;
+  uint64 created_time_to = 5;
+}
+
+message GetUserListResponse {
+  GetUserListResponse data = 1;
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message GetUserListResponse {
+  repeated User users =1;
+}
+
+message GetUserDetailsRequest {
+  uint64 user_id = 1;
+}
+
+message GetUserDetailsResponse {
+  GetUserDetilsResponseData data = 1;
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message GetUserDetailsResponseData {
+  User user = 1;
+}
+
+message CreateUserRequest {
+  User user = 1;
+}
+
+message CreateUserResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message PutUserRequest {
+  User user = 1;
+}
+
+message PutUserResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message UpdateUserStatusRequest {
+  uint64 user_id = 1;
+  uint32 status = 2;
+}
+
+message UpdateUserStatusResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}

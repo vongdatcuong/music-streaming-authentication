@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package music_streaming.authentication.permission;
+
+option go_package="./protos/v1/pb";
+
+import "protos/v1/common.proto";
+
+message Permission {
+  uint64 permission_id = 1;
+  string name = 2;
+  uint64 created_at = 8;
+  uint64 updated_at = 9;
+  uint32 status = 5;
+}
+
+service PermissionService {
+  rpc GetPermissionList (GetPermissionListRequest) returns (GetPermissionListResponse);
+  rpc CreatePermission (CreatePermissionRequest) returns (CreatePermissionResponse);
+  rpc PutPermission (PutPermissionRequest) returns (PutPermissionResponse);
+  rpc CheckUserPermission (CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
+}
+
+message GetPermissionListRequest {
+  music_streaming.authentication.common.MetaRequest meta = 1;
+}
+
+message GetPermissionListResponse {
+  GetPermissionListResponseData data = 1;
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message GetPermissionListResponseData {
+  repeated Permission permissions = 1;
+}
+
+message CreatePermissionRequest {
+  Permission permission = 1;
+}
+
+message CreatePermissionResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message PutPermissionRequest {
+  Permission permission = 1;
+}
+
+message PutPermissionResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message CheckUserPermissionRequest {
+  uint64 user_id = 1;
+  uint64 permission_id = 2;
+  string permission_name = 3;
+}
+
+message CheckUserPermissionResponse {
+  bool has_permission = 1;
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}

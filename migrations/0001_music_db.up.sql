@@ -9,7 +9,8 @@ CREATE TABLE User (
     `created_at` BIGINT(20) NOT NULL,
     `updated_at` BIGINT(20) NOT NULL,
 
-    PRIMARY KEY (`user_id`)
+    PRIMARY KEY (`user_id`),
+    UNIQUE (`email`)
 );
 
 CREATE TABLE Permission (
@@ -19,7 +20,8 @@ CREATE TABLE Permission (
     `updated_at` BIGINT(20) NOT NULL,
     `status` TINYINT UNSIGNED NOT NULL,
 
-    PRIMARY KEY (`permission_id`)
+    PRIMARY KEY (`permission_id`),
+    UNIQUE (`name`)
 );
 
 CREATE TABLE User_Permission (

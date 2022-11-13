@@ -1,0 +1,14 @@
+syntax= "proto3";
+
+package music_streaming.authentication.common;
+
+option go_package="./protos/v1/pb";
+
+message MetaRequest {
+    string email = 1;
+}
+
+message PaginationInfo {
+    uint64 offset = 1;
+    uint64 limit = 2;
+  }
