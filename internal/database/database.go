@@ -9,10 +9,14 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	log "github.com/sirupsen/logrus"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type Database struct {
-	Client *sqlx.DB
+	Client     *sqlx.DB
+	GormClient *gorm.DB
 }
 
 // NewDatabase - returns a pointer to a database object
@@ -33,10 +37,19 @@ func NewDatabase() (*Database, error) {
 		return &Database{}, fmt.Errorf("could not connect to database: %w", err)
 	}
 
+	gormDb, err := gorm.Open(mysql.New(mysql.Config{
+		Conn: db,
+	}), &gorm.Config{})
+
+	if err != nil {
+		return &Database{}, fmt.Errorf("could not open Gorm connection: %w", err)
+	}
+
 	log.Info("Setting up new database connection successfully")
 
 	return &Database{
-		Client: db,
+		Client:     db,
+		GormClient: gormDb,
 	}, nil
 }
 

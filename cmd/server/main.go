@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+
 	"github.com/sirupsen/logrus"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/database"
+	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
 )
 
 func Run() error {
@@ -23,6 +26,9 @@ func Run() error {
 		return err
 	}
 
+	res, _ := db.CheckUserPermission(context.Background(), 1, permission.Permission{Name: "musc_streaming.song.read"})
+	//res2, _ := db.GetPermissionList(context.Background())
+	logrus.Info(res)
 	return nil
 }
 
