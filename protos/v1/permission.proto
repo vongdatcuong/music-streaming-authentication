@@ -5,6 +5,7 @@ package music_streaming.authentication.permission;
 option go_package="./protos/v1/pb";
 
 import "protos/v1/common.proto";
+import "google/api/annotations.proto";
 
 message Permission {
   uint64 permission_id = 1;
@@ -15,9 +16,24 @@ message Permission {
 }
 
 service PermissionService {
-  rpc GetPermissionList (GetPermissionListRequest) returns (GetPermissionListResponse);
-  rpc CreatePermission (CreatePermissionRequest) returns (CreatePermissionResponse);
-  rpc PutPermission (PutPermissionRequest) returns (PutPermissionResponse);
+  rpc GetPermissionList (GetPermissionListRequest) returns (GetPermissionListResponse) {
+    option (google.api.http) = {
+      post: "/gateway/v1/permission/list"
+      body: "*"
+    };
+  };
+  rpc CreatePermission (CreatePermissionRequest) returns (CreatePermissionResponse) {
+    option (google.api.http) = {
+      post: "/gateway/v1/permission/create_permission",
+      body: "*"
+    };
+  };
+  rpc PutPermission (PutPermissionRequest) returns (PutPermissionResponse) {
+    option (google.api.http) = {
+      put: "/gateway/v1/permission/put_permission",
+      body: "*"
+    };
+  };
   rpc CheckUserPermission (CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
 }
 

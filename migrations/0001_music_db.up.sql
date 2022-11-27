@@ -1,4 +1,4 @@
-CREATE TABLE User (
+CREATE TABLE user (
 	`user_id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(256) NOT NULL,
     `first_name` VARCHAR(256) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE User (
     UNIQUE (`email`)
 );
 
-CREATE TABLE Permission (
+CREATE TABLE permission (
 	`permission_id` INT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(256) NOT NULL,
     `created_at` BIGINT(20) NOT NULL,
@@ -24,13 +24,15 @@ CREATE TABLE Permission (
     UNIQUE (`name`)
 );
 
-CREATE TABLE User_Permission (
+
+
+CREATE TABLE user_permission (
 	`permission_id` INT(20) UNSIGNED NOT NULL,
     `user_id` BIGINT(20) UNSIGNED NOT NULL,
     `created_at` BIGINT(20) NOT NULL,
     `updated_at` BIGINT(20) NOT NULL,
 
     PRIMARY KEY (`permission_id`, `user_id`),
-    FOREIGN KEY (`permission_id`) REFERENCES Permission(`permission_id`),
-    FOREIGN KEY (`user_id`) REFERENCES User(`user_id`)
+    FOREIGN KEY (`permission_id`) REFERENCES permission(`permission_id`),
+    FOREIGN KEY (`user_id`) REFERENCES user(`user_id`)
 );

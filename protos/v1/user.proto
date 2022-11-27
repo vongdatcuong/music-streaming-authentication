@@ -5,7 +5,7 @@ package music_streaming.authentication.user;
 option go_package="./protos/v1/pb";
 
 import "protos/v1/common.proto";
-import "protos/v1/permission.proto";
+import "google/api/annotations.proto";
 
 message User {
   uint64 user_id = 1;
@@ -21,11 +21,35 @@ message User {
 }
 
 service UserService {
-  rpc GetUserList (GetUserListRequest) returns (GetUserListResponse);
-  rpc GetUserDetails (GetUserDetailsRequest) returns (GetUserDetailsResponse);
-  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
-  rpc PutUser (PutUserRequest) returns (PutUserResponse);
-  rpc UpdateUserStatus (UpdateUserStatusRequest) returns (UpdateUserStatusResponse);
+  rpc GetUserList (GetUserListRequest) returns (GetUserListResponse) {
+    option (google.api.http) = {
+      post: "/gateway/v1/user/list"
+      body: "*"
+    };
+  };
+  rpc GetUserDetails (GetUserDetailsRequest) returns (GetUserDetailsResponse) {
+    option (google.api.http) = {
+      get: "/gateway/v1/user/details/{user_id}"
+    };
+  };
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/gateway/v1/user/create_user",
+      body: "*"
+    };
+  };
+  rpc PutUser (PutUserRequest) returns (PutUserResponse) {
+    option (google.api.http) = {
+      put: "/gateway/v1/user/put_user",
+      body: "*"
+    };
+  };
+  rpc UpdateUserStatus (UpdateUserStatusRequest) returns (UpdateUserStatusResponse) {
+    option (google.api.http) = {
+      post: "/gateway/v1/user/update_user_status",
+      body: "*"
+    };
+  };;
 }
 
 message GetUserListRequest {
@@ -42,12 +66,12 @@ message GetUserListRequestFilter {
 }
 
 message GetUserListResponse {
-  GetUserListResponse data = 1;
+  GetUserListResponseData data = 1;
   optional uint32 error = 2;
   optional string error_msg = 3;
 }
 
-message GetUserListResponse {
+message GetUserListResponseData {
   repeated User users =1;
 }
 
@@ -56,7 +80,7 @@ message GetUserDetailsRequest {
 }
 
 message GetUserDetailsResponse {
-  GetUserDetilsResponseData data = 1;
+  GetUserDetailsResponseData data = 1;
   optional uint32 error = 2;
   optional string error_msg = 3;
 }

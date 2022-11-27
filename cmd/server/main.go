@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/database"
-	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
+	grpcTransport "github.com/vongdatcuong/music-streaming-authentication/internal/transport/grpc"
 )
 
 func Run() error {
@@ -17,7 +17,7 @@ func Run() error {
 
 	// Ping DB
 	if err := db.Client.DB.Ping(); err != nil {
-		//return fmt.Errorf("could not ping the database: %w", err)
+		return fmt.Errorf("could not ping the database: %w", err)
 	}
 
 	_, err = db.MigrateDB()
@@ -26,9 +26,16 @@ func Run() error {
 		return err
 	}
 
-	res, _ := db.CheckUserPermission(context.Background(), 1, permission.Permission{Name: "musc_streaming.song.read"})
+	//res, _ := db.CheckUserPermission(context.Background(), 1, permission.Permission{Name: "musc_streaming.song.read"})
 	//res2, _ := db.GetPermissionList(context.Background())
-	logrus.Info(res)
+	//logrus.Info(res)
+
+	grpcHandler := grpcTransport.NewHandler()
+
+	if err := grpcHandler.Server(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
