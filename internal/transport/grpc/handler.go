@@ -16,10 +16,11 @@ import (
 type Handler struct {
 	grpcPbV1.UnimplementedPermissionServiceServer
 	grpcPbV1.UnimplementedUserServiceServer
+	permissionService PlaylistServiceGrpc
 }
 
-func NewHandler() *Handler {
-	h := &Handler{}
+func NewHandler(permissionService PlaylistServiceGrpc) *Handler {
+	h := &Handler{permissionService: permissionService}
 
 	return h
 }
@@ -73,6 +74,7 @@ func (h *Handler) RunRestServer(port string, channel chan error) {
 		return
 	}
 	httpMux := http.NewServeMux()
+	httpMux.Handle("/", gwmux)
 
 	if err := http.Serve(restLis, httpMux); err != nil {
 		channel <- fmt.Errorf("could not serve Rest server on port %s: %w", port, err)

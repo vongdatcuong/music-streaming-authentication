@@ -2,22 +2,32 @@ package database
 
 import "github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
 
-func convertPermissionRowCreateToPermission(permRowCreate PermissionRowCreate) permission.Permission {
+func convertPermissionSchemaToPermission(schema PermissionSchema) permission.Permission {
 	return permission.Permission{
-		PermissionID: permRowCreate.ID,
-		Name:         permRowCreate.Name,
-		CreatedAt:    permRowCreate.CreatedAt,
-		UpdatedAt:    permRowCreate.UpdatedAt,
-		Status:       permRowCreate.Status,
+		PermissionID: schema.PermissionID,
+		Name:         schema.Name,
+		CreatedAt:    schema.CreatedAt,
+		UpdatedAt:    schema.UpdatedAt,
+		Status:       schema.Status,
 	}
 }
 
-func convertPermissionRowPutToPermission(existingPerm permission.Permission, permRowPut PermissionRowPut) permission.Permission {
+func convertPermissionSchemaCreateToPermission(schema PermissionSchemaCreate) permission.Permission {
+	return permission.Permission{
+		PermissionID: schema.PermissionID,
+		Name:         schema.Name,
+		CreatedAt:    schema.CreatedAt,
+		UpdatedAt:    schema.UpdatedAt,
+		Status:       schema.Status,
+	}
+}
+
+func convertPermissionSchemaPutToPermission(existingPerm permission.Permission, schema PermissionSchemaPut) permission.Permission {
 	return permission.Permission{
 		PermissionID: existingPerm.PermissionID,
-		Name:         permRowPut.Name,
+		Name:         schema.Name,
 		CreatedAt:    existingPerm.CreatedAt,
-		UpdatedAt:    permRowPut.UpdatedAt,
-		Status:       permRowPut.Status,
+		UpdatedAt:    schema.UpdatedAt,
+		Status:       schema.Status,
 	}
 }

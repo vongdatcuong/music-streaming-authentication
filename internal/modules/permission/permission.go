@@ -8,7 +8,7 @@ import (
 )
 
 type PermissionStore interface {
-	GetPermissionList(context.Context) ([]Permission, uint64, error)
+	GetPermissionList(context.Context) ([]Permission, error)
 	CreatePermission(context.Context, Permission) (Permission, error)
 	PutPermission(context.Context, Permission) (Permission, error)
 	CheckUserPermission(context.Context, uint64, Permission) (bool, error)
@@ -33,14 +33,14 @@ func NewService(store PermissionStore) *PermissionService {
 	}
 }
 
-func (s *PermissionService) GetPermissionList(ctx context.Context) ([]Permission, uint64, error) {
-	permissionList, totalCount, err := s.store.GetPermissionList(ctx)
+func (s *PermissionService) GetPermissionList(ctx context.Context) ([]Permission, error) {
+	permissionList, err := s.store.GetPermissionList(ctx)
 
 	if err != nil {
-		return []Permission{}, 0, err
+		return []Permission{}, err
 	}
 
-	return permissionList, totalCount, nil
+	return permissionList, nil
 }
 
 func (s *PermissionService) CreatePermission(ctx context.Context, newPerm Permission) (Permission, error) {

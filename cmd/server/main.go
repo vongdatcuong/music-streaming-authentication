@@ -5,6 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/database"
+	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
 	grpcTransport "github.com/vongdatcuong/music-streaming-authentication/internal/transport/grpc"
 )
 
@@ -30,7 +31,8 @@ func Run() error {
 	//res2, _ := db.GetPermissionList(context.Background())
 	//logrus.Info(res)
 
-	grpcHandler := grpcTransport.NewHandler()
+	permissionService := permission.NewService(db)
+	grpcHandler := grpcTransport.NewHandler(permissionService)
 
 	if err := grpcHandler.Server(); err != nil {
 		return err

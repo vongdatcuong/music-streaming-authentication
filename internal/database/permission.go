@@ -4,34 +4,25 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/constants"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
 	time_utils "github.com/vongdatcuong/music-streaming-authentication/internal/modules/utils/time"
 	validator_utils "github.com/vongdatcuong/music-streaming-authentication/internal/modules/utils/validator"
 	"gorm.io/gorm"
 )
 
-type PermissionRowCreate struct {
-	ID        uint64
-	Name      string `validate:"required,max=256"`
-	CreatedAt uint64
-	UpdatedAt uint64
-	Status    constants.ACTIVE_STATUS `validate:"required"`
-}
-
-type PermissionRowPut struct {
-	Name      string `validate:"required,max=256"`
-	UpdatedAt uint64
-	Status    constants.ACTIVE_STATUS `validate:"required"`
-}
-
 func (db *Database) GetPermissionList(ctx context.Context) ([]permission.Permission, error) {
-	var permissions []permission.Permission
+	var permissionSchemas []PermissionSchema
 
-	result := db.GormClient.Table(PermissionTableName).Find(&permissions)
+	result := db.GormClient.WithContext(ctx).Find(&permissionSchemas)
 
 	if result.Error != nil {
 		return []permission.Permission{}, fmt.Errorf("could not get the permission list: %w", result.Error)
+	}
+
+	var permissions []permission.Permission
+
+	for _, schema := range permissionSchemas {
+		permissions = append(permissions, convertPermissionSchemaToPermission(schema))
 	}
 
 	return permissions, nil
@@ -39,43 +30,45 @@ func (db *Database) GetPermissionList(ctx context.Context) ([]permission.Permiss
 }
 
 func (db *Database) CreatePermission(ctx context.Context, newPerm permission.Permission) (permission.Permission, error) {
-	permRowCreate := PermissionRowCreate{
+	permSchemaCreate := PermissionSchemaCreate{
 		Name:      newPerm.Name,
 		Status:    newPerm.Status,
 		CreatedAt: time_utils.GetCurrentUnixTime(),
 		UpdatedAt: time_utils.GetCurrentUnixTime(),
 	}
 
-	if err := validator_utils.ValidateStruct(permRowCreate); err != nil {
+	if err := validator_utils.ValidateStruct(permSchemaCreate); err != nil {
 		return permission.Permission{}, fmt.Errorf("permission is not valid: %w", err)
 	}
 
-	result := db.GormClient.Table(PermissionTableName).Create(&permRowCreate)
+	result := db.GormClient.WithContext(ctx).Create(&permSchemaCreate)
 
 	if result.Error != nil {
 		return permission.Permission{}, fmt.Errorf("could not create new permission: %w", result.Error)
 	}
 
-	return convertPermissionRowCreateToPermission(permRowCreate), nil
+	return convertPermissionSchemaCreateToPermission(permSchemaCreate), nil
 }
 
 func (db *Database) PutPermission(ctx context.Context, existingPerm permission.Permission) (permission.Permission, error) {
-	permissionRowPut := PermissionRowPut{
-		Name:      existingPerm.Name,
-		UpdatedAt: time_utils.GetCurrentUnixTime(),
-		Status:    existingPerm.Status,
+	permSchemaPut := PermissionSchemaPut{
+		PermissionID: existingPerm.PermissionID,
+		Name:         existingPerm.Name,
+		UpdatedAt:    time_utils.GetCurrentUnixTime(),
+		Status:       existingPerm.Status,
 	}
 
-	if err := validator_utils.ValidateStruct(permissionRowPut); err != nil {
+	if err := validator_utils.ValidateStruct(permSchemaPut); err != nil {
 		return permission.Permission{}, fmt.Errorf("permission is not valid: %w", err)
 	}
 
-	result := db.GormClient.Table(PermissionTableName).Where("permission_id = ?", existingPerm.PermissionID).Save(&permissionRowPut)
+	result := db.GormClient.WithContext(ctx).Updates(permSchemaPut)
 
 	if result.Error != nil {
-		return permission.Permission{}, fmt.Errorf("could not update permission: %w", result.Error)
+		return permission.Permission{}, fmt.Errorf("could not put permission: %w", result.Error)
 	}
-	return convertPermissionRowPutToPermission(existingPerm, permissionRowPut), nil
+
+	return convertPermissionSchemaPutToPermission(existingPerm, permSchemaPut), nil
 }
 
 // TODO: Test this after implementing User mmodule
