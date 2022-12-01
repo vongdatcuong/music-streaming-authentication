@@ -38,7 +38,7 @@ func (db *Database) CreatePermission(ctx context.Context, newPerm permission.Per
 	}
 
 	if err := validator_utils.ValidateStruct(permSchemaCreate); err != nil {
-		return permission.Permission{}, fmt.Errorf("permission is not valid: %w", err)
+		return permission.Permission{}, fmt.Errorf("permission is invalid: %w", err)
 	}
 
 	result := db.GormClient.WithContext(ctx).Create(&permSchemaCreate)

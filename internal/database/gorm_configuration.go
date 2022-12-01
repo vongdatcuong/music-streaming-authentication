@@ -24,6 +24,18 @@ func (UserSchema) TableName() string {
 	return UserTableName
 }
 
+func (UserSchemaCreate) TableName() string {
+	return UserTableName
+}
+
+func (UserSchemaPut) TableName() string {
+	return UserTableName
+}
+
+func (UpdateUserStatusSchema) TableName() string {
+	return UserTableName
+}
+
 func (UserPermissionSchema) TableName() string {
 	return UserPermissionTableName
 }

@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-
 	log "github.com/sirupsen/logrus"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type Database struct {
@@ -39,7 +37,9 @@ func NewDatabase() (*Database, error) {
 
 	gormDb, err := gorm.Open(mysql.New(mysql.Config{
 		Conn: db,
-	}), &gorm.Config{})
+	}), &gorm.Config{NamingStrategy: schema.NamingStrategy{
+		SingularTable: true,
+	}})
 
 	if err != nil {
 		return &Database{}, fmt.Errorf("could not open Gorm connection: %w", err)
