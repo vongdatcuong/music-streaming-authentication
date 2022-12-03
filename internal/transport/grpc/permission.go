@@ -9,7 +9,7 @@ import (
 	grpcPbV1 "github.com/vongdatcuong/music-streaming-authentication/protos/v1/pb"
 )
 
-type PlaylistServiceGrpc interface {
+type PermissionServiceGrpc interface {
 	GetPermissionList(context.Context) ([]permission.Permission, error)
 	CreatePermission(context.Context, permission.Permission) (permission.Permission, error)
 	PutPermission(context.Context, permission.Permission) (permission.Permission, error)
@@ -94,10 +94,19 @@ func (h *Handler) PutPermission(ctx context.Context, req *grpcPbV1.PutPermission
 	}, nil
 }
 
-// TODO Implement this after User module
 func (h *Handler) CheckUserPermission(ctx context.Context, req *grpcPbV1.CheckUserPermissionRequest) (*grpcPbV1.CheckUserPermissionResponse, error) {
+	hasPerm, err := h.permissionService.CheckUserPermission(ctx, req.UserId, permission.Permission{PermissionID: req.PermissionId, Name: req.PermissionName})
+
+	if err != nil {
+		return &grpcPbV1.CheckUserPermissionResponse{
+			Error:    common_utils.GetUInt32Pointer(1),
+			ErrorMsg: common_utils.GetStringPointer(err.Error()),
+		}, nil
+	}
+
 	return &grpcPbV1.CheckUserPermissionResponse{
-		Error:    nil,
-		ErrorMsg: nil,
+		HasPermission: &hasPerm,
+		Error:         nil,
+		ErrorMsg:      nil,
 	}, nil
 }

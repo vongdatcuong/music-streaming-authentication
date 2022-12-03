@@ -34,7 +34,11 @@ service PermissionService {
       body: "*"
     };
   };
-  rpc CheckUserPermission (CheckUserPermissionRequest) returns (CheckUserPermissionResponse);
+  rpc CheckUserPermission (CheckUserPermissionRequest) returns (CheckUserPermissionResponse) {
+    option (google.api.http) = {
+      get: "/gateway/v1/permission/check_user_permission"
+    };
+  };
 }
 
 message GetPermissionListRequest {
@@ -76,7 +80,7 @@ message CheckUserPermissionRequest {
 }
 
 message CheckUserPermissionResponse {
-  bool has_permission = 1;
+  optional bool has_permission = 1;
   optional uint32 error = 2;
   optional string error_msg = 3;
 }

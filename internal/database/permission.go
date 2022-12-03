@@ -71,7 +71,6 @@ func (db *Database) PutPermission(ctx context.Context, existingPerm permission.P
 	return convertPermissionSchemaPutToPermission(existingPerm, permSchemaPut), nil
 }
 
-// TODO: Test this after implementing User mmodule
 func (db *Database) CheckUserPermission(ctx context.Context, userID uint64, perm permission.Permission) (bool, error) {
 	if perm.PermissionID == 0 && perm.Name == "" {
 		return false, fmt.Errorf("no permission is provided")
@@ -83,15 +82,17 @@ func (db *Database) CheckUserPermission(ctx context.Context, userID uint64, perm
 
 	if perm.PermissionID == 0 {
 		// Check by permission name
-		permResult := db.GormClient.Table(PermissionTableName).Select("permission_id").Where("name = ?", perm.Name).Scan(&permID)
-		if permResult.Error != nil || permID == 0 {
+		permResult := db.GormClient.Model(PermissionSchema{}).Select("permission_id").Where(PermissionSchema{Name: perm.Name}).Scan(&permID)
+		if permResult.Error != nil {
 			return false, fmt.Errorf("could find permission by permission name: %w", permResult.Error)
+		} else if permID == 0 {
+			return false, fmt.Errorf("permission does not exist")
 		}
 	} else {
 		permID = perm.PermissionID
 	}
 
-	result = db.GormClient.Table(UserPermissionTableName).Select("count(*) > 0").Where("user_id = ? AND permission_id = ?", userID, permID).Find(&exists)
+	result = db.GormClient.Model(UserPermissionSchema{}).Select("count(*) > 0").Where(UserPermissionSchema{PermissionID: permID, UserID: userID}).Find(&exists)
 
 	if result.Error != nil {
 		return false, fmt.Errorf("could not check user's permission: %w", result.Error)

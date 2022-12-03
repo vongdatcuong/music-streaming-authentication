@@ -16,11 +16,11 @@ import (
 type Handler struct {
 	grpcPbV1.UnimplementedPermissionServiceServer
 	grpcPbV1.UnimplementedUserServiceServer
-	permissionService PlaylistServiceGrpc
+	permissionService PermissionServiceGrpc
 	userService       UserServiceGrpc
 }
 
-func NewHandler(permissionService PlaylistServiceGrpc, userService UserServiceGrpc) *Handler {
+func NewHandler(permissionService PermissionServiceGrpc, userService UserServiceGrpc) *Handler {
 	h := &Handler{permissionService: permissionService, userService: userService}
 
 	return h
