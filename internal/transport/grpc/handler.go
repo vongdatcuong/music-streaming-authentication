@@ -18,10 +18,11 @@ type Handler struct {
 	grpcPbV1.UnimplementedUserServiceServer
 	permissionService PermissionServiceGrpc
 	userService       UserServiceGrpc
+	authInterceptor   *AuthInterceptor
 }
 
-func NewHandler(permissionService PermissionServiceGrpc, userService UserServiceGrpc) *Handler {
-	h := &Handler{permissionService: permissionService, userService: userService}
+func NewHandler(permissionService PermissionServiceGrpc, userService UserServiceGrpc, authInterceptor *AuthInterceptor) *Handler {
+	h := &Handler{permissionService: permissionService, userService: userService, authInterceptor: authInterceptor}
 
 	return h
 }
@@ -33,7 +34,7 @@ func (h *Handler) RunGrpcServer(port string, channel chan error) {
 		return
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(h.authInterceptor.GrpcUnary()))
 	grpcPbV1.RegisterPermissionServiceServer(grpcServer, h)
 	grpcPbV1.RegisterUserServiceServer(grpcServer, h)
 
@@ -75,7 +76,7 @@ func (h *Handler) RunRestServer(port string, channel chan error) {
 		return
 	}
 	httpMux := http.NewServeMux()
-	httpMux.Handle("/", gwmux)
+	httpMux.Handle("/", h.authInterceptor.HttpMiddleware(gwmux))
 
 	if err := http.Serve(restLis, httpMux); err != nil {
 		channel <- fmt.Errorf("could not serve Rest server on port %s: %w", port, err)

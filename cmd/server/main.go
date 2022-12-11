@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/database"
+	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/jwtAuth"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/user"
+	"github.com/vongdatcuong/music-streaming-authentication/internal/transport/grpc"
 	grpcTransport "github.com/vongdatcuong/music-streaming-authentication/internal/transport/grpc"
 )
 
@@ -34,7 +38,9 @@ func Run() error {
 
 	permissionService := permission.NewService(db)
 	userService := user.NewService(db)
-	grpcHandler := grpcTransport.NewHandler(permissionService, userService)
+	jwtAuthService := jwtAuth.NewService(os.Getenv("JWT_SECRET_KEY"), 6*time.Hour)
+	authInterceptor := grpc.NewAuthInterceptor(jwtAuthService, userService, permissionService)
+	grpcHandler := grpcTransport.NewHandler(permissionService, userService, authInterceptor)
 
 	if err := grpcHandler.Server(); err != nil {
 		return err

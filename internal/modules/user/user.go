@@ -61,7 +61,6 @@ func (s *UserService) GetUserList(ctx context.Context, paginationInfo common.Pag
 
 func (s *UserService) GetUserDetails(ctx context.Context, id uint64) (User, error) {
 	user, err := s.store.GetUserDetails(ctx, id)
-
 	if err != nil {
 		return User{}, err
 	}
@@ -141,4 +140,14 @@ func (s *UserService) UpdateUserPermissions(ctx context.Context, userID uint64, 
 	}
 
 	return nil
+}
+
+func (s *UserService) DoesUserExist(ctx context.Context, userID uint64) (bool, error) {
+	doesExist, err := s.store.DoesUserExist(ctx, userID)
+
+	if err != nil {
+		return false, err
+	}
+
+	return doesExist, nil
 }

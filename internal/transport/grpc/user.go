@@ -17,6 +17,7 @@ type UserServiceGrpc interface {
 	PutUser(context.Context, user.User) (user.User, error)
 	UpdateUserStatus(context.Context, uint64, constants.ACTIVE_STATUS) error
 	UpdateUserPermissions(context.Context, uint64, []uint64, []uint64) error
+	DoesUserExist(context.Context, uint64) (bool, error)
 }
 
 func (h *Handler) GetUserList(ctx context.Context, req *grpcPbV1.GetUserListRequest) (*grpcPbV1.GetUserListResponse, error) {

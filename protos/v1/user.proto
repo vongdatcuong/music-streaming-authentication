@@ -23,36 +23,37 @@ message User {
 service UserService {
   rpc GetUserList (GetUserListRequest) returns (GetUserListResponse) {
     option (google.api.http) = {
-      post: "/gateway/v1/user/list"
+      post: "/api/gateway/v1/user/list"
       body: "*"
     };
   };
   rpc GetUserDetails (GetUserDetailsRequest) returns (GetUserDetailsResponse) {
     option (google.api.http) = {
-      get: "/gateway/v1/user/details/{user_id}"
+      post: "/api/gateway/v1/user/details",
+      body: "*"
     };
   };
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
-      post: "/gateway/v1/user/create_user",
+      post: "/api/gateway/v1/user/create_user",
       body: "*"
     };
   };
   rpc PutUser (PutUserRequest) returns (PutUserResponse) {
     option (google.api.http) = {
-      put: "/gateway/v1/user/put_user",
+      put: "/api/gateway/v1/user/put_user",
       body: "*"
     };
   };
   rpc UpdateUserStatus (UpdateUserStatusRequest) returns (UpdateUserStatusResponse) {
     option (google.api.http) = {
-      post: "/gateway/v1/user/update_user_status",
+      post: "/api/gateway/v1/user/update_user_status",
       body: "*"
     };
   };
   rpc UpdateUserPermissions (UpdateUserPermissionsRequest) returns (UpdateUserPermissionsResponse) {
     option (google.api.http) = {
-      post: "/gateway/v1/user/update_user_permission",
+      post: "/api/gateway/v1/user/update_user_permission",
       body: "*"
     };
   };
