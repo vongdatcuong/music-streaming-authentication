@@ -3,9 +3,12 @@ package user
 import (
 	"context"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/common"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/constants"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserStore interface {
@@ -16,6 +19,7 @@ type UserStore interface {
 	UpdateUserStatus(context.Context, uint64, constants.ACTIVE_STATUS) error
 	DoesUserExist(context.Context, uint64) (bool, error)
 	UpdateUserPermissions(context.Context, uint64, []uint64, []uint64) error
+	LogIn(context.Context, User) (User, error)
 }
 
 type UserService struct {
@@ -69,8 +73,16 @@ func (s *UserService) GetUserDetails(ctx context.Context, id uint64) (User, erro
 }
 
 func (s *UserService) CreateUser(ctx context.Context, newUser User) (User, error) {
+	round, _ := strconv.ParseInt(os.Getenv("BCRYPT_SALT_ROUNDS"), 10, 32)
 	wrappedUser := User(newUser)
 	wrappedUser.Status = constants.ACTIVE_STATUS_ACTIVE
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), int(round))
+
+	if err != nil {
+		return User{}, fmt.Errorf("could not hash password: %w", err)
+	}
+
+	wrappedUser.Password = string(hashedPassword)
 
 	user, err := s.store.CreateUser(ctx, wrappedUser)
 
@@ -150,4 +162,25 @@ func (s *UserService) DoesUserExist(ctx context.Context, userID uint64) (bool, e
 	}
 
 	return doesExist, nil
+}
+
+func (s *UserService) LogIn(ctx context.Context, user User) (User, error) {
+	fetchedUser, err := s.store.LogIn(ctx, user)
+
+	if err != nil {
+		return User{}, err
+	}
+
+	if fetchedUser.UserID == 0 {
+		return User{}, fmt.Errorf("email or password is incorrect")
+	}
+
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(fetchedUser.Password), []byte(user.Password))
+
+	if err != nil {
+		return User{}, fmt.Errorf("email or password is incorrect")
+	}
+
+	return fetchedUser, nil
 }

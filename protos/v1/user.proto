@@ -57,6 +57,12 @@ service UserService {
       body: "*"
     };
   };
+  rpc LogIn (LogInRequest) returns (LogInResponse) {
+    option (google.api.http) = {
+      post: "/api/gateway/v1/auth/login",
+      body: "*"
+    };
+  };
 }
 
 message GetUserListRequest {
@@ -79,7 +85,7 @@ message GetUserListResponse {
 }
 
 message GetUserListResponseData {
-  repeated User users =1;
+  repeated User users = 1;
   optional uint64 total_count = 2;
 }
 
@@ -102,8 +108,8 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-  optional uint32 error = 2;
-  optional string error_msg = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
 }
 
 message PutUserRequest {
@@ -111,8 +117,8 @@ message PutUserRequest {
 }
 
 message PutUserResponse {
-  optional uint32 error = 2;
-  optional string error_msg = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
 }
 
 message UpdateUserStatusRequest {
@@ -121,8 +127,8 @@ message UpdateUserStatusRequest {
 }
 
 message UpdateUserStatusResponse {
-  optional uint32 error = 2;
-  optional string error_msg = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
 }
 
 message UpdateUserPermissionsRequest {
@@ -132,6 +138,18 @@ message UpdateUserPermissionsRequest {
 }
 
 message UpdateUserPermissionsResponse {
-  optional uint32 error = 2;
-  optional string error_msg = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
+}
+
+message LogInRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LogInResponse {
+  string token = 1;
+  User user = 2; 
+  optional uint32 error = 3;
+  optional string error_msg = 4;
 }

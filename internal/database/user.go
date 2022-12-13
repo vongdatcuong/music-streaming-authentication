@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/common"
@@ -9,6 +10,7 @@ import (
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/user"
 	time_utils "github.com/vongdatcuong/music-streaming-authentication/internal/modules/utils/time"
 	validator_utils "github.com/vongdatcuong/music-streaming-authentication/internal/modules/utils/validator"
+	"gorm.io/gorm"
 )
 
 func (db *Database) GetUserList(ctx context.Context, paginationInfo common.PaginationInfo, filter user.UserListFilter) ([]user.User, uint64, error) {
@@ -41,7 +43,7 @@ func (db *Database) GetUserList(ctx context.Context, paginationInfo common.Pagin
 	var users []user.User
 
 	for _, schema := range userSchemas {
-		users = append(users, convertUserSchemaToUser(schema))
+		users = append(users, convertUserSchemaToUser(schema, false))
 	}
 
 	return users, uint64(totalCount), nil
@@ -55,7 +57,7 @@ func (db *Database) GetUserDetails(ctx context.Context, id uint64) (user.User, e
 		return user.User{}, fmt.Errorf("could not get user details: %w", result.Error)
 	}
 
-	return convertUserSchemaToUser(record), nil
+	return convertUserSchemaToUser(record, false), nil
 }
 
 func (db *Database) CreateUser(ctx context.Context, newUser user.User) (user.User, error) {
@@ -66,7 +68,7 @@ func (db *Database) CreateUser(ctx context.Context, newUser user.User) (user.Use
 		LastName:    newUser.LastName,
 		Status:      newUser.Status,
 		Password:    newUser.Password,
-		NewSongNoti: &newUser.NewSongNoti,
+		NewSongNoti: newUser.NewSongNoti,
 		CreatedAt:   time_utils.GetCurrentUnixTime(),
 		UpdatedAt:   time_utils.GetCurrentUnixTime(),
 	}
@@ -198,4 +200,16 @@ func (db *Database) DeletePermissionOfUser(ctx context.Context, userID uint64, p
 	}
 
 	return nil
+}
+
+func (db *Database) LogIn(ctx context.Context, loginUser user.User) (user.User, error) {
+	var userSchema UserSchema
+
+	result := db.GormClient.Model(&UserSchema{}).Where(UserSchema{Email: loginUser.Email}).First(&userSchema)
+
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return user.User{}, fmt.Errorf("could not login user: %w", result.Error)
+	}
+
+	return convertUserSchemaToUser(userSchema, true), nil
 }

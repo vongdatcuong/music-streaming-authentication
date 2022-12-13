@@ -18,6 +18,7 @@ var userPermissions map[string]string = map[string]string{
 // Endpoints
 const permissionServicePath string = "/music_streaming.authentication.permission.PermissionService"
 const userServicePath string = "/music_streaming.authentication.user.UserService"
+const authPath string = "/music_streaming.authentication.user.LogIn"
 
 var EndPointPermissions map[string][]string = map[string][]string{
 	// Permission
@@ -25,18 +26,25 @@ var EndPointPermissions map[string][]string = map[string][]string{
 	permissionServicePath + "/CreatePermission":  {permissionPermissions["WRITE"]},
 	permissionServicePath + "/PutPermission":     {permissionPermissions["WRITE"]},
 	// User
-	userServicePath + "/GetUserList":           {userPermissions["READ"]},
-	userServicePath + "/GetUserDetails":        {userPermissions["READ"]},
-	userServicePath + "/CreateUser":            {userPermissions["WRITE"]},
+	userServicePath + "/GetUserList":    {userPermissions["READ"]},
+	userServicePath + "/GetUserDetails": {userPermissions["READ"]},
+	userServicePath + "/CreateUser":     {userPermissions["WRITE"]},
+	// TODO: Admin can update all users, but a particular user can only update his/her own profile
 	userServicePath + "/PutUser":               {userPermissions["WRITE"]},
 	userServicePath + "/UpdateUserStatus":      {userPermissions["WRITE"]},
 	userServicePath + "/UpdateUserPermissions": {userPermissions["WRITE"]},
+}
+
+var EndPointNoAuthentication map[string]bool = map[string]bool{
+	authPath + "/LogIn":             true,
+	userServicePath + "/CreateUser": true,
 }
 
 // Http
 const httpPath = "/api/gateway/v1"
 const httpPermissionPath = httpPath + "/permission"
 const httpUserPath = httpPath + "/user"
+const httpAuthPath = httpPath + "/auth"
 
 var HttpEndPointPermissions map[string][]string = map[string][]string{
 	// Permission
@@ -47,8 +55,12 @@ var HttpEndPointPermissions map[string][]string = map[string][]string{
 	// User
 	httpUserPath + "/list":                   {userPermissions["READ"]},
 	httpUserPath + "/details":                {userPermissions["READ"]},
-	httpUserPath + "/create_user":            {userPermissions["WRITE"]},
 	httpUserPath + "/put_user":               {userPermissions["WRITE"]},
 	httpUserPath + "/update_user_status":     {userPermissions["WRITE"]},
 	httpUserPath + "/update_user_permission": {userPermissions["WRITE"]},
+}
+
+var HttpEndPointNoAuthentication map[string]bool = map[string]bool{
+	httpAuthPath + "/login":       true,
+	httpUserPath + "/create_user": true,
 }

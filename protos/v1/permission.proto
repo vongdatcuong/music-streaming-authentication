@@ -60,8 +60,8 @@ message CreatePermissionRequest {
 }
 
 message CreatePermissionResponse {
-  optional uint32 error = 2;
-  optional string error_msg = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
 }
 
 message PutPermissionRequest {
@@ -69,8 +69,8 @@ message PutPermissionRequest {
 }
 
 message PutPermissionResponse {
-  optional uint32 error = 2;
-  optional string error_msg = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
 }
 
 message CheckUserPermissionRequest {

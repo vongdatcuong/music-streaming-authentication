@@ -18,6 +18,7 @@ type UserServiceGrpc interface {
 	UpdateUserStatus(context.Context, uint64, constants.ACTIVE_STATUS) error
 	UpdateUserPermissions(context.Context, uint64, []uint64, []uint64) error
 	DoesUserExist(context.Context, uint64) (bool, error)
+	LogIn(context.Context, user.User) (user.User, error)
 }
 
 func (h *Handler) GetUserList(ctx context.Context, req *grpcPbV1.GetUserListRequest) (*grpcPbV1.GetUserListResponse, error) {
@@ -172,6 +173,36 @@ func (h *Handler) UpdateUserPermissions(ctx context.Context, req *grpcPbV1.Updat
 	}
 
 	return &grpcPbV1.UpdateUserPermissionsResponse{
+		Error:    nil,
+		ErrorMsg: nil,
+	}, nil
+}
+
+func (h *Handler) LogIn(ctx context.Context, req *grpcPbV1.LogInRequest) (*grpcPbV1.LogInResponse, error) {
+	fetchedUser, err := h.userService.LogIn(ctx, user.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+
+	if err != nil {
+		return &grpcPbV1.LogInResponse{
+			Error:    common_utils.GetUInt32Pointer(1),
+			ErrorMsg: common_utils.GetStringPointer(err.Error()),
+		}, nil
+	}
+
+	token, err := h.authInterceptor.jwtService.GenerateToken(fetchedUser.UserID)
+
+	if err != nil {
+		return &grpcPbV1.LogInResponse{
+			Error:    common_utils.GetUInt32Pointer(1),
+			ErrorMsg: common_utils.GetStringPointer(err.Error()),
+		}, nil
+	}
+
+	return &grpcPbV1.LogInResponse{
+		Token:    token,
+		User:     convertUserToGrpcUser(fetchedUser),
 		Error:    nil,
 		ErrorMsg: nil,
 	}, nil

@@ -31,7 +31,7 @@ func (interceptor *AuthInterceptor) GrpcUnary() grpc.UnaryServerInterceptor {
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
 		md, _ := metadata.FromIncomingContext(ctx)
-		err, _ := interceptor.authorize(ctx, md["authorization"], info.FullMethod, EndPointPermissions)
+		err, _ := interceptor.authorize(ctx, md["authorization"], info.FullMethod, EndPointPermissions, EndPointNoAuthentication)
 
 		if err != nil {
 			return nil, err
@@ -43,7 +43,7 @@ func (interceptor *AuthInterceptor) GrpcUnary() grpc.UnaryServerInterceptor {
 
 func (interceptor *AuthInterceptor) HttpMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err, errCode := interceptor.authorize(r.Context(), r.Header["Authorization"], r.URL.Path, HttpEndPointPermissions)
+		err, errCode := interceptor.authorize(r.Context(), r.Header["Authorization"], r.URL.Path, HttpEndPointPermissions, HttpEndPointNoAuthentication)
 
 		if err != nil {
 			sendErrorResponse(w, http.StatusInternalServerError, errCode, err.Error())
@@ -54,7 +54,11 @@ func (interceptor *AuthInterceptor) HttpMiddleware(next http.Handler) http.Handl
 	})
 }
 
-func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []string, path string, permissionsMap map[string][]string) (error, uint32) {
+func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []string, path string, permissionsMap map[string][]string, noAuthenMap map[string]bool) (error, uint32) {
+	if noAuthenMap[path] {
+		return nil, 0
+	}
+
 	accessToken, err := parseAuthorizationHeader(authHeader)
 
 	if err != nil {

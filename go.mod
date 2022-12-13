@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/sirupsen/logrus v1.9.0
+	golang.org/x/crypto v0.4.0
 	google.golang.org/genproto v0.0.0-20221114212237-e4508ebdbee1
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1
@@ -21,9 +22,8 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
-	golang.org/x/net v0.2.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/net v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 )
 
 require (
@@ -34,6 +34,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.14.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
-	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
 	gorm.io/driver/mysql v1.4.4
 )

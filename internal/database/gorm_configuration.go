@@ -36,6 +36,10 @@ func (UpdateUserStatusSchema) TableName() string {
 	return UserTableName
 }
 
+func (LogInSchema) TableName() string {
+	return UserTableName
+}
+
 func (UserPermissionSchema) TableName() string {
 	return UserPermissionTableName
 }
