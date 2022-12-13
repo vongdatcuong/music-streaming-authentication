@@ -31,6 +31,7 @@ services:
       GRPC_PORT: "8002"
       REST_PORT: "8012"
       JWT_SECRET_KEY: "jwt_secret_key"
+      BCRYPT_SALT_ROUNDS: "5"
     ports:
       - "8002:8002"
       - "8012:8012"
