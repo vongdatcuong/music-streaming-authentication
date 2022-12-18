@@ -6,7 +6,7 @@ import (
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/constants"
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
 	common_utils "github.com/vongdatcuong/music-streaming-authentication/internal/modules/utils/common"
-	grpcPbV1 "github.com/vongdatcuong/music-streaming-authentication/protos/v1/pb"
+	grpcPbV1 "github.com/vongdatcuong/music-streaming-protos/go/v1"
 )
 
 type PermissionServiceGrpc interface {

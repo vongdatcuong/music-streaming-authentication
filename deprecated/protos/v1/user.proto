@@ -66,7 +66,7 @@ service UserService {
 }
 
 message GetUserListRequest {
-  music_streaming.authentication.common.PaginationInfo pagination_info = 1;
+  music_streaming.common.PaginationInfo pagination_info = 1;
   GetUserListRequestFilter filter = 2;
 }
 

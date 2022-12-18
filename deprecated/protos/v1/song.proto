@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package music_streaming.music.song;
+
+option go_package="./protos/v1/pb";
+
+import "protos/v1/common.proto";
+import "google/api/annotations.proto";
+
+message Song {
+  uint64 song_id = 1;
+  string name = 2;
+  music_streaming.common.NameValueInt32 genre = 3; // Update this
+  string artist = 4;
+  float duration = 5;
+  string language = 6;
+  float rating = 7;
+  // Check this
+  string resource_id = 8;
+  string resource_link = 9;
+  uint64 created_at = 10;
+  uint64 updated_at = 11;
+  uint32 status = 12;
+}
+
+service SongService {
+  rpc GetSongList (GetSongListRequest) returns (GetSongListResponse) {
+    option (google.api.http) = {
+      post: "/api/gateway/v1/song/list"
+      body: "*"
+    };
+  };
+  rpc GetSongDetails (GetSongDetailsRequest) returns (GetSongDetailsResponse) {
+    option (google.api.http) = {
+      post: "/api/gateway/v1/song/details",
+      body: "*"
+    };
+  };
+  rpc CreateSong (CreateSongRequest) returns (CreateSongResponse) {
+    option (google.api.http) = {
+      post: "/api/gateway/v1/song/create_song",
+      body: "*"
+    };
+  };
+  rpc PutSong (PutSongRequest) returns (PutSongResponse) {
+    option (google.api.http) = {
+      put: "/api/gateway/v1/song/put_song",
+      body: "*"
+    };
+  };
+  rpc DeleteSong (DeleteSongRequest) returns (DeleteSongResponse) {
+    option (google.api.http) = {
+      post: "/api/gateway/v1/song/delete_song"
+    };
+  };
+}
+
+// Get Song List
+message GetSongListRequest {
+  music_streaming.common.PaginationInfo pagination_info = 1;
+  GetSongListFilter filter = 2;
+}
+
+message GetSongListFilter {
+  string name = 1;
+  uint32 genre = 2;
+  string artist = 3;
+  float duration = 4;
+  string language = 5;
+  uint64 created_time_from = 6;
+  uint64 created_time_to = 7;
+}
+
+message GetSongListResponse {
+  GetSongListResponseData data = 3;
+  optional uint32 error = 1;
+  optional string error_msg = 2;
+}
+
+message GetSongListResponseData {
+  repeated Song songs = 1;
+  optional uint64 total_count = 2;
+}
+
+// Get Song Details
+message GetSongDetailsRequest {
+   uint64 song_id = 1;
+}
+
+message GetSongDetailsResponse {
+  GetSongDetailsResponseData data = 1;
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+message GetSongDetailsResponseData {
+  Song song = 1;
+}
+
+// Create Song
+message CreateSongRequest {
+  Song song = 1;
+}
+
+message CreateSongResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+// Put Song
+message PutSongRequest {
+  Song song = 1;
+}
+
+message PutSongResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}
+
+// Delete Song
+message DeleteSongRequest {
+  uint64 song_id = 1;
+}
+
+message DeleteSongResponse {
+  optional uint32 error = 2;
+  optional string error_msg = 3;
+}

@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/permission"
-	grpcPbV1 "github.com/vongdatcuong/music-streaming-authentication/protos/v1/pb"
+	grpcPbV1 "github.com/vongdatcuong/music-streaming-protos/go/v1"
 )
 
 func convertPermissionToGrpcPermission(permission permission.Permission) *grpcPbV1.Permission {

@@ -34,6 +34,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.14.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
+	github.com/vongdatcuong/music-streaming-protos v0.0.0-20221218100058-c82503ee1151
 	golang.org/x/sys v0.3.0 // indirect
 	gorm.io/driver/mysql v1.4.4
 )

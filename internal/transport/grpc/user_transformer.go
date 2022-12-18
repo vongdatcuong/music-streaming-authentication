@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/user"
-	grpcPbV1 "github.com/vongdatcuong/music-streaming-authentication/protos/v1/pb"
+	grpcPbV1 "github.com/vongdatcuong/music-streaming-protos/go/v1"
 )
 
 func convertUserToGrpcUser(user user.User) *grpcPbV1.User {
