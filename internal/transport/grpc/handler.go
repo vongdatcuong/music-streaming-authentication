@@ -1,16 +1,12 @@
 package grpc
 
 import (
-	"context"
 	"fmt"
 	"net"
-	"net/http"
 	"os"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	grpcPbV1 "github.com/vongdatcuong/music-streaming-protos/go/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type Handler struct {
@@ -43,7 +39,7 @@ func (h *Handler) RunGrpcServer(port string, channel chan error) {
 	}
 }
 
-func (h *Handler) RunRestServer(port string, channel chan error) {
+/*func (h *Handler) RunRestServer(port string, channel chan error) {
 	gwmux := runtime.NewServeMux(
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 			MarshalOptions: protojson.MarshalOptions{
@@ -81,17 +77,17 @@ func (h *Handler) RunRestServer(port string, channel chan error) {
 	if err := http.Serve(restLis, httpMux); err != nil {
 		channel <- fmt.Errorf("could not serve Rest server on port %s: %w", port, err)
 	}
-}
+}*/
 
 func (h *Handler) Server() error {
-	grpcChannel, restChannel := make(chan error), make(chan error)
+	grpcChannel := make(chan error)
 	go h.RunGrpcServer(os.Getenv("GRPC_PORT"), grpcChannel)
-	go h.RunRestServer(os.Getenv("REST_PORT"), restChannel)
+	//go h.RunRestServer(os.Getenv("REST_PORT"), restChannel)
 
 	select {
 	case grpcError := <-grpcChannel:
 		return grpcError
-	case restError := <-restChannel:
-		return restError
+		//case restError := <-restChannel:
+		//	return restError
 	}
 }

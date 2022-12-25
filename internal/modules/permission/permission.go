@@ -15,8 +15,13 @@ type PermissionStore interface {
 	DoesPermissionExist(context.Context, uint64) (bool, error)
 }
 
+type UserService interface {
+	DoesUserExist(context.Context, uint64) (bool, error)
+}
+
 type PermissionService struct {
-	store PermissionStore
+	store       PermissionStore
+	userService UserService
 }
 
 type Permission struct {
@@ -27,9 +32,10 @@ type Permission struct {
 	Status       constants.ACTIVE_STATUS
 }
 
-func NewService(store PermissionStore) *PermissionService {
+func NewService(store PermissionStore, userService UserService) *PermissionService {
 	return &PermissionService{
-		store: store,
+		store:       store,
+		userService: userService,
 	}
 }
 
@@ -77,12 +83,28 @@ func (s *PermissionService) PutPermission(ctx context.Context, existingPerm Perm
 	return permission, nil
 }
 
-func (s *PermissionService) CheckUserPermission(ctx context.Context, userID uint64, perm Permission) (bool, error) {
+// TODO: Remove check user exist completely
+func (s *PermissionService) CheckUserPermission(ctx context.Context, userID uint64, perm Permission) (bool, bool, error) {
+	/*doesUserExist, err := s.userService.DoesUserExist(ctx, userID)
+
+	if err != nil {
+		return false, false, err
+	}
+
+	if !doesUserExist {
+		return false, false, fmt.Errorf("user does not exist")
+	}*/
+
+	// perm empty => endpoint doesn't require any permission
+	if perm.Name == "" && perm.PermissionID == 0 {
+		return true, true, nil
+	}
+
 	hasPerm, err := s.store.CheckUserPermission(ctx, userID, perm)
 
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
 
-	return hasPerm, nil
+	return hasPerm, true, nil
 }

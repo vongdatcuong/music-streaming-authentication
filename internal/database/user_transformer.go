@@ -35,7 +35,7 @@ func convertUserSchemaCreateToUser(schema UserSchemaCreate) user.User {
 		FirstName:   schema.FirstName,
 		LastName:    schema.LastName,
 		Status:      schema.Status,
-		NewSongNoti: schema.NewSongNoti,
+		NewSongNoti: *schema.NewSongNoti,
 		CreatedAt:   schema.CreatedAt,
 		UpdatedAt:   schema.UpdatedAt,
 	}

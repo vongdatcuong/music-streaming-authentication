@@ -47,7 +47,7 @@ type UserSchemaCreate struct {
 	LastName    string                  `gorm:"column:last_name" validate:"max=256"`
 	Status      constants.ACTIVE_STATUS `gorm:"column:status" validate:"required"`
 	Password    string                  `gorm:"column:password" validate:"required"`
-	NewSongNoti bool                    `gorm:"column:new_song_noti"`
+	NewSongNoti *bool                   `gorm:"column:new_song_noti"`
 	CreatedAt   uint64                  `gorm:"column:created_at"`
 	UpdatedAt   uint64                  `gorm:"column:updated_at"`
 }

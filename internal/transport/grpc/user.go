@@ -207,3 +207,20 @@ func (h *Handler) LogIn(ctx context.Context, req *grpcPbV1.LogInRequest) (*grpcP
 		ErrorMsg: nil,
 	}, nil
 }
+
+func (h *Handler) Authenticate(ctx context.Context, req *grpcPbV1.AuthenticateRequest) (*grpcPbV1.AuthenticateResponse, error) {
+	doesExist, err := h.userService.DoesUserExist(ctx, req.UserId)
+
+	if err != nil {
+		return &grpcPbV1.AuthenticateResponse{
+			Error:    common_utils.GetUInt32Pointer(1),
+			ErrorMsg: common_utils.GetStringPointer(err.Error()),
+		}, nil
+	}
+
+	return &grpcPbV1.AuthenticateResponse{
+		IsAuthenticated: &doesExist,
+		Error:           nil,
+		ErrorMsg:        nil,
+	}, nil
+}

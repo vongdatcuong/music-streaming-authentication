@@ -18,7 +18,7 @@ var userPermissions map[string]string = map[string]string{
 // Endpoints
 const permissionServicePath string = "/music_streaming.authentication.permission.PermissionService"
 const userServicePath string = "/music_streaming.authentication.user.UserService"
-const authPath string = "/music_streaming.authentication.user.LogIn"
+const authPath string = "/music_streaming.authentication.user.UserService"
 
 var EndPointPermissions map[string][]string = map[string][]string{
 	// Permission
@@ -36,12 +36,13 @@ var EndPointPermissions map[string][]string = map[string][]string{
 }
 
 var EndPointNoAuthentication map[string]bool = map[string]bool{
-	authPath + "/LogIn":             true,
-	userServicePath + "/CreateUser": true,
+	authPath + "/LogIn":               true,
+	userServicePath + "/CreateUser":   true,
+	userServicePath + "/Authenticate": true,
 }
 
 // Http
-const httpPath = "/api/gateway/v1"
+/*const httpPath = "/api/gateway/v1"
 const httpPermissionPath = httpPath + "/permission"
 const httpUserPath = httpPath + "/user"
 const httpAuthPath = httpPath + "/auth"
@@ -64,3 +65,4 @@ var HttpEndPointNoAuthentication map[string]bool = map[string]bool{
 	httpAuthPath + "/login":       true,
 	httpUserPath + "/create_user": true,
 }
+*/

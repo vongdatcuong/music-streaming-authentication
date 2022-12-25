@@ -13,7 +13,7 @@ type PermissionServiceGrpc interface {
 	GetPermissionList(context.Context) ([]permission.Permission, error)
 	CreatePermission(context.Context, permission.Permission) (permission.Permission, error)
 	PutPermission(context.Context, permission.Permission) (permission.Permission, error)
-	CheckUserPermission(context.Context, uint64, permission.Permission) (bool, error)
+	CheckUserPermission(context.Context, uint64, permission.Permission) (bool, bool, error)
 }
 
 func (h *Handler) GetPermissionList(ctx context.Context, req *grpcPbV1.GetPermissionListRequest) (*grpcPbV1.GetPermissionListResponse, error) {
@@ -95,7 +95,7 @@ func (h *Handler) PutPermission(ctx context.Context, req *grpcPbV1.PutPermission
 }
 
 func (h *Handler) CheckUserPermission(ctx context.Context, req *grpcPbV1.CheckUserPermissionRequest) (*grpcPbV1.CheckUserPermissionResponse, error) {
-	hasPerm, err := h.permissionService.CheckUserPermission(ctx, req.UserId, permission.Permission{PermissionID: req.PermissionId, Name: req.PermissionName})
+	hasPerm, doesUserExist, err := h.permissionService.CheckUserPermission(ctx, req.UserId, permission.Permission{PermissionID: req.PermissionId, Name: req.PermissionName})
 
 	if err != nil {
 		return &grpcPbV1.CheckUserPermissionResponse{
@@ -105,8 +105,9 @@ func (h *Handler) CheckUserPermission(ctx context.Context, req *grpcPbV1.CheckUs
 	}
 
 	return &grpcPbV1.CheckUserPermissionResponse{
-		HasPermission: &hasPerm,
-		Error:         nil,
-		ErrorMsg:      nil,
+		HasPermission:   &hasPerm,
+		IsAuthenticated: &doesUserExist,
+		Error:           nil,
+		ErrorMsg:        nil,
 	}, nil
 }

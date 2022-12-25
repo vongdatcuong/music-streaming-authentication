@@ -68,7 +68,7 @@ func (db *Database) CreateUser(ctx context.Context, newUser user.User) (user.Use
 		LastName:    newUser.LastName,
 		Status:      newUser.Status,
 		Password:    newUser.Password,
-		NewSongNoti: newUser.NewSongNoti,
+		NewSongNoti: &newUser.NewSongNoti,
 		CreatedAt:   time_utils.GetCurrentUnixTime(),
 		UpdatedAt:   time_utils.GetCurrentUnixTime(),
 	}

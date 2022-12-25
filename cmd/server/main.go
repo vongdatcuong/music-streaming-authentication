@@ -36,8 +36,8 @@ func Run() error {
 	//res2, _ := db.GetPermissionList(context.Background())
 	//logrus.Info(res)
 
-	permissionService := permission.NewService(db)
 	userService := user.NewService(db)
+	permissionService := permission.NewService(db, userService)
 	jwtAuthService := jwtAuth.NewService(os.Getenv("JWT_SECRET_KEY"), 6*time.Hour)
 	authInterceptor := grpc.NewAuthInterceptor(jwtAuthService, userService, permissionService)
 	grpcHandler := grpcTransport.NewHandler(permissionService, userService, authInterceptor)
