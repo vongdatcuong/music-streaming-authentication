@@ -32,10 +32,6 @@ func Run() error {
 		return err
 	}
 
-	//res, _ := db.CheckUserPermission(context.Background(), 1, permission.Permission{Name: "musc_streaming.song.read"})
-	//res2, _ := db.GetPermissionList(context.Background())
-	//logrus.Info(res)
-
 	userService := user.NewService(db)
 	permissionService := permission.NewService(db, userService)
 	jwtAuthService := jwtAuth.NewService(os.Getenv("JWT_SECRET_KEY"), 6*time.Hour)

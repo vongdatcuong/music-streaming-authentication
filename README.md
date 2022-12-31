@@ -10,3 +10,5 @@ Music Streaming Authentication Service
 - Use grpc-gateway to run Rest server (http endpoints)
 - Use jwt, grpc interceptor, http middleware to implement authentication and authorization
 - Provide endpoint for other service to do authentication and authorization
+- Migrate Authentication operation to API Gateway. One issue was to defined error response for all Grpc endpoints
+- Inject jwt token to grpc interceptor context so that grpc methods have access to jwt token

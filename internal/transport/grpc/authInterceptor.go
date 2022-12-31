@@ -32,19 +32,19 @@ func (interceptor *AuthInterceptor) GrpcUnary() grpc.UnaryServerInterceptor {
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
 		md, _ := metadata.FromIncomingContext(ctx)
-		err, _ := interceptor.authorize(ctx, md["authorization"], info.FullMethod, EndPointPermissions, EndPointNoAuthentication)
+		injectedContext, err, _ := interceptor.authorize(ctx, md["authorization"], info.FullMethod, EndPointPermissions, EndPointNoAuthentication)
 
 		if err != nil {
 			return getRespective403Response(info.FullMethod), nil
 		}
 
-		return handler(ctx, req)
+		return handler(injectedContext, req)
 	}
 }
 
 /*func (interceptor *AuthInterceptor) HttpMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err, errCode := interceptor.authorize(r.Context(), r.Header["Authorization"], r.URL.Path, HttpEndPointPermissions)
+		_, err, errCode := interceptor.authorize(r.Context(), r.Header["Authorization"], r.URL.Path, HttpEndPointPermissions)
 
 		if err != nil {
 			sendErrorResponse(w, http.StatusInternalServerError, errCode, err.Error())
@@ -55,22 +55,21 @@ func (interceptor *AuthInterceptor) GrpcUnary() grpc.UnaryServerInterceptor {
 	})
 }*/
 
-func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []string, path string, permissionsMap map[string][]string, noAuthenMap map[string]bool) (error, uint32) {
+func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []string, path string, permissionsMap map[string][]string, noAuthenMap map[string]bool) (context.Context, error, uint32) {
 	if noAuthenMap[path] {
-		return nil, 0
+		return ctx, nil, 0
 	}
-
 	accessToken, err := parseAuthorizationHeader(authHeader)
-
 	if err != nil {
-		return err, 1
+		return ctx, err, 1
 	}
 
 	claims, err := interceptor.jwtService.ValidateToken(accessToken)
 
 	if err != nil {
-		return err, 1
+		return ctx, err, 1
 	}
+	newCtx := interceptor.jwtService.InjectToken(ctx, accessToken)
 
 	requiredPerm := permissionsMap[path]
 	var firstRequiredPermName string
@@ -85,14 +84,14 @@ func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []
 	})
 
 	if err != nil {
-		return err, 1
+		return newCtx, err, 1
 	}
 
 	if !hasPerm {
-		return fmt.Errorf("you have no permission to access this resource"), 403
+		return newCtx, fmt.Errorf("you have no permission to access this resource"), 403
 	}
 
-	return nil, 0
+	return newCtx, nil, 0
 }
 
 func parseAuthorizationHeader(values []string) (string, error) {

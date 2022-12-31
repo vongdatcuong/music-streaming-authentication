@@ -94,7 +94,6 @@ func (s *PermissionService) CheckUserPermission(ctx context.Context, userID uint
 	if !doesUserExist {
 		return false, false, fmt.Errorf("user does not exist")
 	}*/
-
 	// perm empty => endpoint doesn't require any permission
 	if perm.Name == "" && perm.PermissionID == 0 {
 		return true, true, nil

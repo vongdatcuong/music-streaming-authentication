@@ -1,6 +1,7 @@
 package jwtAuth
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -57,4 +58,8 @@ func (s *JwtService) ValidateToken(accessToken string) (*UserClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func (s *JwtService) InjectToken(ctx context.Context, accessToken string) context.Context {
+	return context.WithValue(ctx, "authorization", "Bearer "+accessToken)
 }
