@@ -32,7 +32,7 @@ func (interceptor *AuthInterceptor) GrpcUnary() grpc.UnaryServerInterceptor {
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
 		md, _ := metadata.FromIncomingContext(ctx)
-		injectedContext, err, _ := interceptor.authorize(ctx, md["authorization"], info.FullMethod, EndPointPermissions, EndPointNoAuthentication)
+		injectedContext, err, _ := interceptor.authorize(ctx, req, md["authorization"], info.FullMethod, EndPointPermissions, EndPointNoAuthentication, EndPointPermissionFuncs)
 
 		if err != nil {
 			return getRespective403Response(info.FullMethod), nil
@@ -55,7 +55,9 @@ func (interceptor *AuthInterceptor) GrpcUnary() grpc.UnaryServerInterceptor {
 	})
 }*/
 
-func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []string, path string, permissionsMap map[string][]string, noAuthenMap map[string]bool) (context.Context, error, uint32) {
+func (interceptor *AuthInterceptor) authorize(ctx context.Context, req interface{}, authHeader []string,
+	path string, permissionsMap map[string][]string, noAuthenMap map[string]bool,
+	permissionFuncsMap map[string](func(jwtAuth.UserClaims, any) (bool, error))) (context.Context, error, uint32) {
 	if noAuthenMap[path] {
 		return ctx, nil, 0
 	}
@@ -70,6 +72,22 @@ func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []
 		return ctx, err, 1
 	}
 	newCtx := interceptor.jwtService.InjectToken(ctx, accessToken)
+
+	requiredPermFunc := permissionFuncsMap[path]
+
+	if requiredPermFunc != nil {
+		isAllowed, err := requiredPermFunc(*claims, req)
+
+		if err != nil {
+			return ctx, err, 1
+		}
+
+		// Success
+		if isAllowed {
+			return newCtx, nil, 0
+		}
+
+	}
 
 	requiredPerm := permissionsMap[path]
 	var firstRequiredPermName string
@@ -91,6 +109,7 @@ func (interceptor *AuthInterceptor) authorize(ctx context.Context, authHeader []
 		return newCtx, fmt.Errorf("you have no permission to access this resource"), 403
 	}
 
+	// Success
 	return newCtx, nil, 0
 }
 

@@ -1,5 +1,12 @@
 package grpc
 
+import (
+	"fmt"
+
+	"github.com/vongdatcuong/music-streaming-authentication/internal/modules/jwtAuth"
+	grpcPbV1 "github.com/vongdatcuong/music-streaming-protos/go/v1"
+)
+
 // Permissions
 const permissionPermPrefix = "music_streaming.permission"
 
@@ -39,6 +46,65 @@ var EndPointNoAuthentication map[string]bool = map[string]bool{
 	authPath + "/LogIn":               true,
 	userServicePath + "/CreateUser":   true,
 	userServicePath + "/Authenticate": true,
+}
+
+var EndPointPermissionFuncs map[string](func(jwtAuth.UserClaims, any) (bool, error)) = map[string](func(jwtAuth.UserClaims, any) (bool, error)){
+	userServicePath + "/GetUserDetails":        CheckGetUserDetails,
+	userServicePath + "/PutUser":               CheckPutUser,
+	userServicePath + "/UpdateUserStatus":      CheckUpdateUserStatus,
+	userServicePath + "/UpdateUserPermissions": CheckUpdateUserPermissions,
+}
+
+func CheckGetUserDetails(userClaims jwtAuth.UserClaims, req any) (bool, error) {
+	assertedReq, ok := req.(*grpcPbV1.GetUserDetailsRequest)
+	if !ok {
+		return false, fmt.Errorf("want type *GetUserDetailsRequest;  got %T", req)
+	}
+
+	if userClaims.UserID == assertedReq.UserId {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func CheckPutUser(userClaims jwtAuth.UserClaims, req any) (bool, error) {
+	assertedReq, ok := req.(*grpcPbV1.PutUserRequest)
+	if !ok {
+		return false, fmt.Errorf("want type *PutUserRequest;  got %T", req)
+	}
+
+	if assertedReq.User != nil && userClaims.UserID == assertedReq.User.UserId {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func CheckUpdateUserStatus(userClaims jwtAuth.UserClaims, req any) (bool, error) {
+	assertedReq, ok := req.(*grpcPbV1.UpdateUserStatusRequest)
+	if !ok {
+		return false, fmt.Errorf("want type *UpdateUserStatusRequest;  got %T", req)
+	}
+
+	if userClaims.UserID == assertedReq.UserId {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func CheckUpdateUserPermissions(userClaims jwtAuth.UserClaims, req any) (bool, error) {
+	assertedReq, ok := req.(*grpcPbV1.UpdateUserPermissionsRequest)
+	if !ok {
+		return false, fmt.Errorf("want type *UpdateUserPermissionsRequest;  got %T", req)
+	}
+
+	if userClaims.UserID == assertedReq.UserId {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 // Http
