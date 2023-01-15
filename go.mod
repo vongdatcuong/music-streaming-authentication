@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/sirupsen/logrus v1.9.0
-	github.com/vongdatcuong/music-streaming-protos v0.0.4
+	github.com/vongdatcuong/music-streaming-protos v0.0.6
 	golang.org/x/crypto v0.4.0
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37
 	google.golang.org/grpc v1.51.0

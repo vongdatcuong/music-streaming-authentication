@@ -17,7 +17,7 @@ func (db *Database) GetUserList(ctx context.Context, paginationInfo common.Pagin
 	var userSchemas []UserSchema
 	var totalCount int64
 
-	result := db.GormClient.WithContext(ctx).Preload("Permissions").Order("created_at desc, user_id").
+	result := db.GormClient.WithContext(ctx).Preload("Permissions").Order("updated_at desc, user_id").
 		Where(UserSchema{UserID: filter.UserID, Email: filter.Email, Status: filter.Status}).Find(&userSchemas)
 
 	if filter.CreatedTimeFrom != 0 {
@@ -116,8 +116,9 @@ func (db *Database) PutUser(ctx context.Context, curUser user.User) (user.User, 
 
 func (db *Database) UpdateUserStatus(ctx context.Context, userID uint64, status constants.ACTIVE_STATUS) error {
 	schema := UpdateUserStatusSchema{
-		UserID: userID,
-		Status: status,
+		UserID:    userID,
+		Status:    status,
+		UpdatedAt: time_utils.GetCurrentUnixTime(),
 	}
 
 	err := validator_utils.ValidateStruct(schema)
@@ -148,7 +149,18 @@ func (db *Database) DoesUserExist(ctx context.Context, id uint64) (bool, error) 
 }
 
 func (db *Database) UpdateUserPermissions(ctx context.Context, userID uint64, addedPermissionIDs []uint64, deletedPermissionIDs []uint64) error {
-	err := db.AddPermissionOfUser(ctx, userID, addedPermissionIDs)
+	schema := UpdateUserPermissionsSchema{
+		UserID:    userID,
+		UpdatedAt: time_utils.GetCurrentUnixTime(),
+	}
+
+	err := validator_utils.ValidateStruct(schema)
+
+	if err != nil {
+		return fmt.Errorf("params invalid: %w", err)
+	}
+
+	err = db.AddPermissionOfUser(ctx, userID, addedPermissionIDs)
 
 	if err != nil {
 		return err
@@ -158,6 +170,12 @@ func (db *Database) UpdateUserPermissions(ctx context.Context, userID uint64, ad
 
 	if err != nil {
 		return err
+	}
+
+	result := db.GormClient.WithContext(ctx).Updates(&schema)
+
+	if result.Error != nil {
+		return fmt.Errorf("could not update user permissions: %w", result.Error)
 	}
 
 	return nil
@@ -212,4 +230,32 @@ func (db *Database) LogIn(ctx context.Context, loginUser user.User) (user.User, 
 	}
 
 	return convertUserSchemaToUser(userSchema, true), nil
+}
+
+func (db *Database) GetUserListAutocomplete(ctx context.Context, paginationInfo common.PaginationInfo, filter user.UserListAutocompleteFilter) ([]user.User, uint64, error) {
+	var userSchemas []UserSchema
+	var totalCount int64
+
+	result := db.GormClient.WithContext(ctx).Order("email, created_at desc, user_id").
+		Where("email like ?", "%"+filter.Email+"%").Find(&userSchemas)
+
+	result.Count(&totalCount)
+
+	if result.Error != nil {
+		return []user.User{}, 0, fmt.Errorf("could not count the total number of users: %w", result.Error)
+	}
+
+	result = result.Scopes(Paginate(paginationInfo)).Find(&userSchemas)
+
+	if result.Error != nil {
+		return []user.User{}, 0, fmt.Errorf("could not get the user list autocomplete: %w", result.Error)
+	}
+
+	var users []user.User
+
+	for _, schema := range userSchemas {
+		users = append(users, convertUserSchemaToUserAutocomplete(schema))
+	}
+
+	return users, uint64(totalCount), nil
 }

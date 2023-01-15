@@ -181,6 +181,23 @@ func getRespective403Response(path string) any {
 			Error:    errCode,
 			ErrorMsg: errMsg,
 		}
+	} else if path == userServicePath+"/GetUserListAutocomplete" {
+		return &grpcPbV1.GetUserListAutocompleteResponse{
+			Error:    errCode,
+			ErrorMsg: errMsg,
+		}
 	}
 	return nil
 }
+
+/*
+1. Other services to dial to CheckUserPermission for permission checking
+2.
+Permission
+	- Song List, Song Details: can remove perm since every users can view songs
+	- Song Create, Put, Delete: leave it be
+	- Playlist all endpoints: if have respective perm, then can access. Otherwise, continue to check if required resource is of its own user
+	- Permissions: leave it be since it purely internal stuff and required high perm to operate
+	- User: Same as playlist
+
+docker inspect -f '{{ $network := index .NetworkSettings.Networks "api-gateway_fullstack" }}{{ $network.IPAddress}}' music-streaming-authentication-service*/

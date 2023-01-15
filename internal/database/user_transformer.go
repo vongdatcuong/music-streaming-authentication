@@ -53,3 +53,16 @@ func convertUserSchemaPutToUser(schema UserSchemaPut, curUser user.User) user.Us
 		UpdatedAt:   schema.UpdatedAt,
 	}
 }
+
+func convertUserSchemaToUserAutocomplete(schema UserSchema) user.User {
+	return user.User{
+		UserID:      schema.UserID,
+		Email:       schema.Email,
+		FirstName:   schema.FirstName,
+		LastName:    schema.LastName,
+		Status:      schema.Status,
+		NewSongNoti: schema.NewSongNoti,
+		CreatedAt:   schema.CreatedAt,
+		UpdatedAt:   schema.UpdatedAt,
+	}
+}

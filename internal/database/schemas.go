@@ -63,13 +63,19 @@ type UserSchemaPut struct {
 }
 
 type UpdateUserStatusSchema struct {
-	UserID uint64                  `gorm:"column:user_id;primaryKey"`
-	Status constants.ACTIVE_STATUS `gorm:"column:status" validate:"required"`
+	UserID    uint64                  `gorm:"column:user_id;primaryKey"`
+	Status    constants.ACTIVE_STATUS `gorm:"column:status" validate:"required"`
+	UpdatedAt uint64                  `gorm:"column:updated_at"`
 }
 
 type LogInSchema struct {
 	Email    string `gorm:"column:email" validate:"required"`
 	Password string `gorm:"column:password" validate:"required"`
+}
+
+type UpdateUserPermissionsSchema struct {
+	UserID    uint64 `gorm:"column:user_id;primaryKey"`
+	UpdatedAt uint64 `gorm:"column:updated_at"`
 }
 
 // USER_PERMISSION

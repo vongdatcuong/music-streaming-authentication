@@ -43,3 +43,7 @@ func (LogInSchema) TableName() string {
 func (UserPermissionSchema) TableName() string {
 	return UserPermissionTableName
 }
+
+func (UpdateUserPermissionsSchema) TableName() string {
+	return UserTableName
+}

@@ -20,6 +20,7 @@ type UserStore interface {
 	DoesUserExist(context.Context, uint64) (bool, error)
 	UpdateUserPermissions(context.Context, uint64, []uint64, []uint64) error
 	LogIn(context.Context, User) (User, error)
+	GetUserListAutocomplete(context.Context, common.PaginationInfo, UserListAutocompleteFilter) ([]User, uint64, error)
 }
 
 type UserService struct {
@@ -45,6 +46,10 @@ type UserListFilter struct {
 	Status          constants.ACTIVE_STATUS
 	CreatedTimeFrom uint64
 	CreatedTimeTo   uint64
+}
+
+type UserListAutocompleteFilter struct {
+	Email string
 }
 
 func NewService(store UserStore) *UserService {
@@ -183,4 +188,14 @@ func (s *UserService) LogIn(ctx context.Context, user User) (User, error) {
 	}
 
 	return fetchedUser, nil
+}
+
+func (s *UserService) GetUserListAutocomplete(ctx context.Context, paginationInfo common.PaginationInfo, filter UserListAutocompleteFilter) ([]User, uint64, error) {
+	userList, totalCount, err := s.store.GetUserListAutocomplete(ctx, paginationInfo, filter)
+
+	if err != nil {
+		return []User{}, 0, err
+	}
+
+	return userList, totalCount, nil
 }

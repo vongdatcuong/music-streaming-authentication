@@ -19,6 +19,7 @@ type UserServiceGrpc interface {
 	UpdateUserPermissions(context.Context, uint64, []uint64, []uint64) error
 	DoesUserExist(context.Context, uint64) (bool, error)
 	LogIn(context.Context, user.User) (user.User, error)
+	GetUserListAutocomplete(context.Context, common.PaginationInfo, user.UserListAutocompleteFilter) ([]user.User, uint64, error)
 }
 
 func (h *Handler) GetUserList(ctx context.Context, req *grpcPbV1.GetUserListRequest) (*grpcPbV1.GetUserListResponse, error) {
@@ -222,5 +223,45 @@ func (h *Handler) Authenticate(ctx context.Context, req *grpcPbV1.AuthenticateRe
 		IsAuthenticated: &doesExist,
 		Error:           nil,
 		ErrorMsg:        nil,
+	}, nil
+}
+
+func (h *Handler) GetUserListAutocomplete(ctx context.Context, req *grpcPbV1.GetUserListAutocompleteRequest) (*grpcPbV1.GetUserListAutocompleteResponse, error) {
+	var pagination common.PaginationInfo = common.PaginationInfo{}
+	var filter user.UserListAutocompleteFilter = user.UserListAutocompleteFilter{}
+
+	if req.PaginationInfo != nil {
+		pagination = common.PaginationInfo{
+			Offset: req.PaginationInfo.Offset,
+			Limit:  req.PaginationInfo.Limit,
+		}
+	}
+
+	if req.Filter != nil {
+		filter.Email = req.Filter.Email
+	}
+
+	users, totalCount, err := h.userService.GetUserListAutocomplete(ctx, pagination, filter)
+
+	if err != nil {
+		return &grpcPbV1.GetUserListAutocompleteResponse{
+			Error:    common_utils.GetUInt32Pointer(1),
+			ErrorMsg: common_utils.GetStringPointer(err.Error()),
+		}, nil
+	}
+
+	var grpcUsers [](*grpcPbV1.User)
+
+	for _, item := range users {
+		grpcUsers = append(grpcUsers, convertUserToGrpcUserAutocomplete(item))
+	}
+
+	return &grpcPbV1.GetUserListAutocompleteResponse{
+		Data: &grpcPbV1.GetUserListAutocompleteResponseData{
+			Users:      grpcUsers,
+			TotalCount: &totalCount,
+		},
+		Error:    nil,
+		ErrorMsg: nil,
 	}, nil
 }

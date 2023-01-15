@@ -37,9 +37,10 @@ var EndPointPermissions map[string][]string = map[string][]string{
 	userServicePath + "/GetUserDetails": {userPermissions["READ"]},
 	userServicePath + "/CreateUser":     {userPermissions["WRITE"]},
 	// TODO: Admin can update all users, but a particular user can only update his/her own profile
-	userServicePath + "/PutUser":               {userPermissions["WRITE"]},
-	userServicePath + "/UpdateUserStatus":      {userPermissions["WRITE"]},
-	userServicePath + "/UpdateUserPermissions": {userPermissions["WRITE"]},
+	userServicePath + "/PutUser":                 {userPermissions["WRITE"]},
+	userServicePath + "/UpdateUserStatus":        {userPermissions["WRITE"]},
+	userServicePath + "/UpdateUserPermissions":   {userPermissions["WRITE"]},
+	userServicePath + "/GetUserListAutocomplete": {userPermissions["READ"]},
 }
 
 var EndPointNoAuthentication map[string]bool = map[string]bool{
